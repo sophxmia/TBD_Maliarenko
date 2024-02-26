@@ -2,8 +2,6 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Arrays;
 
@@ -12,21 +10,20 @@ public class MainFrame extends JFrame {
     private final JTextField passwordField;
     private final JTextField newPasswordField;
     private final JCheckBox complexPasswordCheckbox;
+    private final JTextField accessLevelField;
     private static final String DATABASE_FILE = "src/maliarenko_database.csv";
     //файл, в якому зберігатимуться старі паролі
     private static final String OLD_PASSWORDS_FILE = "src/maliarenko_old_passwords.csv";
-    // Поле для зберігання імені користувача
-    private final String username;
 
     public MainFrame(String username) {
         // Збереження імені користувача
-        this.username = username;
+        // Поле для зберігання імені користувача
 
         // Встановлення заголовку вікна
         setTitle("TBD_Maliarenko - " + username);
 
         // Встановлення розміру вікна
-        setSize(400, 400);
+        setSize(500, 500);
 
         // Встановлення локації вікна
         setLocation(500, 200);
@@ -42,7 +39,7 @@ public class MainFrame extends JFrame {
 
         // Створення панелі для компонентів
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 2));
+        panel.setLayout(new GridLayout(7, 2));
         // Додавання поля для введення імені користувача
         panel.add(new Label("Ім'я користувача:"));
         usernameField = new JTextField();
@@ -58,6 +55,10 @@ public class MainFrame extends JFrame {
         complexPasswordCheckbox = new JCheckBox();
         panel.add(complexPasswordCheckbox);
 
+        panel.add(new JLabel("Рівень доступу:"));
+        accessLevelField = new JTextField(); // Створення текстового поля для введення рівня доступу
+        panel.add(accessLevelField);
+
         // Додавання поля для введення нового пароля
         panel.add(new JLabel("Новий пароль:"));
         newPasswordField = new JPasswordField();
@@ -70,44 +71,55 @@ public class MainFrame extends JFrame {
         // Додавання кнопки для додавання користувача
         JButton addUserButton = getjButton();
         panel.add(addUserButton);
-        // Додавання панелі до вікна
+
+        // Додавання кнопки для відкриття ресурсів
+        JButton openResourcesButton = new JButton("Відкрити ресурси");
+        openResourcesButton.addActionListener(e -> {
+            ResourceWindow resourceWindow = new ResourceWindow(username);
+            resourceWindow.setVisible(true);
+        });
+        panel.add(openResourcesButton);
+
+        // Додавання кнопки для зміни користувача
+        JButton switchUserButton = new JButton("Змінити Користувача");
+        switchUserButton.addActionListener(e -> {
+            AuthenticationFrame authFrame = new AuthenticationFrame();
+            authFrame.setVisible(true);
+        });
+        panel.add(switchUserButton);
+
         add(panel);
     }
 
     private JButton getButton() {
         JButton changePasswordButton = new JButton("Змінити пароль");
-        changePasswordButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String oldPassword = passwordField.getText();
-                String newPassword = newPasswordField.getText();
-                boolean isComplex = complexPasswordCheckbox.isSelected();
-                changeUserPassword(username, oldPassword, newPassword, isComplex);
-            }
+        changePasswordButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String oldPassword = passwordField.getText();
+            String newPassword = newPasswordField.getText();
+            boolean isComplex = complexPasswordCheckbox.isSelected();
+            changeUserPassword(username, oldPassword, newPassword, isComplex);
         });
         return changePasswordButton;
     }
 
     private JButton getjButton() {
         JButton addUserButton = new JButton("Додати користувача");
-        addUserButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = passwordField.getText();
-                boolean isComplex = complexPasswordCheckbox.isSelected();
-                addUser(username, password, isComplex);
-            }
+        addUserButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            boolean isComplex = complexPasswordCheckbox.isSelected();
+            String accessLevel = accessLevelField.getText(); // Отримання значення рівня доступу з поля
+            addUser(username, password, isComplex, accessLevel);
         });
         return addUserButton;
     }
 
-    private void addUser(String username, String password, boolean isComplex) {
+    private void addUser(String username, String password, boolean isComplex, String accessLevel) {
         validatePasswordComplexity(isComplex, password);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATABASE_FILE, true))) {
-            writer.write(username + ":" + password + ":" + (isComplex ? "Complex" : "Simple"));
+            writer.write(username + ":" + password + ":" + (isComplex ? "Complex" : "Simple") + ":" + accessLevel);
             writer.newLine();
             JOptionPane.showMessageDialog(MainFrame.this,
                     "Користувач " + username + " успішно доданий до бази даних.");
@@ -115,7 +127,6 @@ public class MainFrame extends JFrame {
             JOptionPane.showMessageDialog(MainFrame.this,
                     "Помилка під час запису до файлу бази даних.",
                     "Помилка", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
@@ -179,7 +190,7 @@ public class MainFrame extends JFrame {
                         if (parts.length == 1) { // Користувач без пароля
                             writer.write(username + ":" + newPassword + ":" + (isComplexNew ? "Complex" : "Simple"));
                         } else if (parts.length == 3 && parts[1].equals(oldPassword)) {
-                            writer.write(username + ":" + newPassword + ":" + (isComplexNew ? "Complex" : "Simple"));
+                            writer.write(username + ":" + newPassword + ":" + (isComplexNew ? "Complex" : "Simple") + ":" + parts[2]);
                         } else {
                             writer.write(line);
                         }
@@ -216,7 +227,6 @@ public class MainFrame extends JFrame {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Помилка під час зміни паролю.",
                     "Помилка", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         } catch (IllegalArgumentException ex) {
             // Обробка помилок перевірки складності пароля
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Помилка", JOptionPane.ERROR_MESSAGE);
@@ -267,13 +277,8 @@ public class MainFrame extends JFrame {
 
         // Додавання пункту меню "Про автора"
         JMenuItem authorItem = new JMenuItem("Інформація про автора");
-        authorItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(MainFrame.this,
-                        "Номер групи: BI-444\nПрізвище: Maliarenko\nІм'я: Sofiia");
-            }
-        });
+        authorItem.addActionListener(e -> JOptionPane.showMessageDialog(MainFrame.this,
+                "Номер групи: BI-444\nПрізвище: Maliarenko\nІм'я: Sofiia"));
         aboutMenu.add(authorItem);
 
         // Додавання пункту меню до панелі меню
@@ -287,70 +292,5 @@ public class MainFrame extends JFrame {
             AuthenticationFrame authFrame = new AuthenticationFrame();
             authFrame.setVisible(true);
         });
-    }
-}
-
-class AuthenticationFrame extends JFrame {
-    private final JTextField usernameField;
-    private final JPasswordField passwordField;
-    private static final String DATABASE_FILE = "src/maliarenko_database.csv";
-
-    public AuthenticationFrame() {
-        setTitle("Автентифікація");
-        setSize(300, 150);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 2));
-
-        panel.add(new JLabel("Ім'я користувача:"));
-        usernameField = new JTextField();
-        panel.add(usernameField);
-
-        panel.add(new JLabel("Пароль:"));
-        passwordField = new JPasswordField();
-        panel.add(passwordField);
-
-        JButton loginButton = getjButton();
-        panel.add(loginButton);
-
-        add(panel);
-    }
-
-    private JButton getjButton() {
-        JButton loginButton = new JButton("Увійти");
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-
-                if (authenticateUser(username, password)) {
-                    MainFrame mainFrame = new MainFrame(username);
-                    mainFrame.setVisible(true);
-                    dispose(); // Закриваємо вікно автентифікації після успішної автентифікації
-                } else {
-                    JOptionPane.showMessageDialog(AuthenticationFrame.this,
-                            "Невірне ім'я користувача або пароль.", "Помилка", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        return loginButton;
-    }
-
-    private boolean authenticateUser(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts[0].equals(username) && parts[1].equals(password)) {
-                    return true; // Користувача знайдено і пароль співпадає
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false; // Користувача не знайдено або пароль не співпадає
     }
 }
