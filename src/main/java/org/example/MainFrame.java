@@ -116,6 +116,14 @@ public class MainFrame extends JFrame {
     }
 
     private void addUser(String username, String password, boolean isComplex, String accessLevel) {
+        // Перевірка складності паролю для користувачів з рівнями доступу "Середній" та "Високий"
+        if ((accessLevel.equals("Середній") || accessLevel.equals("Високий")) && !isComplex) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                    "Користувачі з рівнями доступу 'Середній' та 'Високий' повинні мати складний пароль.",
+                    "Помилка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         validatePasswordComplexity(isComplex, password);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATABASE_FILE, true))) {
@@ -168,6 +176,15 @@ public class MainFrame extends JFrame {
 
     private void changeUserPassword(String username, String oldPassword, String newPassword, boolean isComplexNew) {
         try {
+            if (isComplexNew) {
+                String accessLevel = getAccessLevel(username);
+                if (accessLevel.equals("Середній") || accessLevel.equals("Високий")) {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                            "Користувачі з рівнями доступу 'Середній' та 'Високий' повинні мати складний пароль.",
+                            "Помилка", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
             validatePasswordComplexity(isComplexNew, newPassword);
             //масив для зберігання старих паролів
             String[] oldPasswords = getOldPasswords(username);
@@ -269,6 +286,20 @@ public class MainFrame extends JFrame {
             throw new RuntimeException(e);
         }
     }
+
+    private String getAccessLevel(String username) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts.length >= 4 && parts[0].equals(username)) {
+                    return parts[3]; // Повертаємо рівень доступу
+                }
+            }
+        }
+        throw new IllegalArgumentException("Користувача з ім'ям " + username + " не знайдено.");
+    }
+
 
 
     private JMenuBar getjMenuBar() {
