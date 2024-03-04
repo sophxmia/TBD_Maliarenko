@@ -29,8 +29,8 @@ public class UserManagementSystem {
     }
     public String getUserAccessLevel(String username){
         for (User user : users){
-            if(user.getUsername().equals(username)){
-                return user.getAccessLevel();
+            if(user.username().equals(username)){
+                return user.accessLevel();
             }
         }
         return null; // Користувач не знайдений

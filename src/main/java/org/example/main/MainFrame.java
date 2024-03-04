@@ -1,4 +1,6 @@
-package org.example;
+package org.example.main;
+
+import org.example.ResourceWindow;
 
 import javax.swing.*;
 import java.awt.*;

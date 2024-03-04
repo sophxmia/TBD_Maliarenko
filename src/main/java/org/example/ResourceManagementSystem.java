@@ -26,7 +26,6 @@ public class ResourceManagementSystem {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                String username = parts[0].trim(); // Користувач
                 for (int i = 1; i < parts.length; i++) {
                     String access = parts[i].trim(); // Отримуємо доступ
                     // Створюємо об'єкт ресурсу з іменем та рівнем доступу
@@ -41,8 +40,8 @@ public class ResourceManagementSystem {
 
     public String getResourceAccessLevel(String resourceName) {
         for (Resource resource : resources) {
-            if (resource.getResourceName().equals(resourceName)) {
-                return resource.getAccessLevel();
+            if (resource.resourceName().equals(resourceName)) {
+                return resource.accessLevel();
             }
         }
         return null;

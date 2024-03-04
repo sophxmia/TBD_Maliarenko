@@ -5,13 +5,6 @@ import java.awt.*;
 import java.io.File;
 
 public class ResourceWindow extends JFrame {
-    private final String[] resourcePaths = {
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file1.txt",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file2.txt",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file3.txt",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file.exe",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/image.bmp"
-    };
 
     public ResourceWindow(String username) {
         setTitle("Ресурси");
@@ -21,6 +14,14 @@ public class ResourceWindow extends JFrame {
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(5, 1));
+
+        String[] resourcePaths = {
+                "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file1.txt",
+                "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file2.txt",
+                "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file3.txt",
+                "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file.exe",
+                "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/image.bmp"
+        };
 
         for (int i = 0; i < resourcePaths.length; i++) {
             String resourcePath = resourcePaths[i];
