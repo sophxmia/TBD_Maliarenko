@@ -1,4 +1,4 @@
-package org.example;
+package org.example.mandatoryAccess;
 
 import javax.swing.*;
 import java.awt.*;

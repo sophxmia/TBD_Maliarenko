@@ -59,13 +59,13 @@ class AuthenticationFrame extends JFrame {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
                 if (parts[0].equals(username) && parts[1].equals(password)) {
-                    return true; // Користувача знайдено і пароль співпадає
+                    return true;
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return false; // Користувача не знайдено або пароль не співпадає
+        return false;
     }
 
 }

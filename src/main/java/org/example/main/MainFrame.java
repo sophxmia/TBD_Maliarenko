@@ -1,6 +1,6 @@
 package org.example.main;
 
-import org.example.ResourceWindow;
+import org.example.mandatoryAccess.ResourceWindow;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,63 +18,47 @@ public class MainFrame extends JFrame {
     private static final String OLD_PASSWORDS_FILE = "src/maliarenko_old_passwords.csv";
 
     public MainFrame(String username) {
-        // Збереження імені користувача
-        // Поле для зберігання імені користувача
-
         // Встановлення заголовку вікна
         setTitle("TBD_Maliarenko - " + username);
 
-        // Встановлення розміру вікна
         setSize(500, 500);
 
-        // Встановлення локації вікна
         setLocation(500, 200);
 
-        // Встановлення дії закриття вікна
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Створення пункту меню та підменю
         JMenuBar menuBar = getjMenuBar();
 
-        // Встановлення панелі меню для головного вікна
         setJMenuBar(menuBar);
 
-        // Створення панелі для компонентів
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(7, 2));
-        // Додавання поля для введення імені користувача
         panel.add(new Label("Ім'я користувача:"));
         usernameField = new JTextField();
         panel.add(usernameField);
 
-        // Додавання поля для введення пароля
         panel.add(new JLabel("Пароль:"));
         passwordField = new JPasswordField();
         panel.add(passwordField);
 
-        // Додавання чекбоксу для вибору складності пароля
         panel.add(new JLabel("Складний пароль:"));
         complexPasswordCheckbox = new JCheckBox();
         panel.add(complexPasswordCheckbox);
 
         panel.add(new JLabel("Рівень доступу:"));
-        accessLevelField = new JTextField(); // Створення текстового поля для введення рівня доступу
+        accessLevelField = new JTextField();
         panel.add(accessLevelField);
 
-        // Додавання поля для введення нового пароля
         panel.add(new JLabel("Новий пароль:"));
         newPasswordField = new JPasswordField();
         panel.add(newPasswordField);
 
-        // Додавання кнопки для зміни пароля
         JButton changePasswordButton = getButton();
         panel.add(changePasswordButton);
 
-        // Додавання кнопки для додавання користувача
         JButton addUserButton = getjButton();
         panel.add(addUserButton);
 
-        // Додавання кнопки для відкриття ресурсів
         JButton openResourcesButton = new JButton("Відкрити ресурси");
         openResourcesButton.addActionListener(e -> {
             ResourceWindow resourceWindow = new ResourceWindow(username);
@@ -82,7 +66,6 @@ public class MainFrame extends JFrame {
         });
         panel.add(openResourcesButton);
 
-        // Додавання кнопки для зміни користувача
         JButton switchUserButton = new JButton("Змінити Користувача");
         switchUserButton.addActionListener(e -> {
             AuthenticationFrame authFrame = new AuthenticationFrame();
@@ -111,7 +94,7 @@ public class MainFrame extends JFrame {
             String username = usernameField.getText();
             String password = passwordField.getText();
             boolean isComplex = complexPasswordCheckbox.isSelected();
-            String accessLevel = accessLevelField.getText(); // Отримання значення рівня доступу з поля
+            String accessLevel = accessLevelField.getText();
             addUser(username, password, isComplex, accessLevel);
         });
         return addUserButton;
@@ -302,28 +285,16 @@ public class MainFrame extends JFrame {
         throw new IllegalArgumentException("Користувача з ім'ям " + username + " не знайдено.");
     }
 
-
-
     private JMenuBar getjMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenu aboutMenu = new JMenu("Про автора");
-
-        // Додавання пункту меню "Про автора"
+        
         JMenuItem authorItem = new JMenuItem("Інформація про автора");
         authorItem.addActionListener(e -> JOptionPane.showMessageDialog(MainFrame.this,
                 "Номер групи: BI-444\nПрізвище: Maliarenko\nІм'я: Sofiia"));
         aboutMenu.add(authorItem);
 
-        // Додавання пункту меню до панелі меню
         menuBar.add(aboutMenu);
         return menuBar;
-    }
-
-    public static void main(String[] args) {
-        // Створення та відображення головного вікна
-        SwingUtilities.invokeLater(() -> {
-            AuthenticationFrame authFrame = new AuthenticationFrame();
-            authFrame.setVisible(true);
-        });
     }
 }

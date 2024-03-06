@@ -1,4 +1,4 @@
-package org.example;
+package org.example.mandatoryAccess;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
