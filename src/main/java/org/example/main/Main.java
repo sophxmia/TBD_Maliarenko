@@ -10,7 +10,7 @@ public class Main {
         accessControlMethod = askForAccessControlMethod();
 
         SwingUtilities.invokeLater(() -> {
-            AuthenticationFrame authFrame = new AuthenticationFrame();
+            AuthenticationFrame authFrame = new AuthenticationFrame(accessControlMethod);
             authFrame.setVisible(true);
         });
 

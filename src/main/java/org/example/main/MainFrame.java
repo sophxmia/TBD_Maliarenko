@@ -5,10 +5,14 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
 
-    public MainFrame(String username) {
+    private final String accessControlMethod;
+
+    public MainFrame(String username, String accessControlMethod) {
+        this.accessControlMethod = accessControlMethod;
         initializeFrame(username);
         addComponents(username);
     }
+
 
     private void initializeFrame(String username) {
         setTitle("TBD_Maliarenko - " + username);
@@ -45,7 +49,7 @@ public class MainFrame extends JFrame {
 
         JButton switchUserButton = new JButton("Змінити Користувача");
         switchUserButton.addActionListener(e -> {
-            AuthenticationFrame authFrame = new AuthenticationFrame();
+            AuthenticationFrame authFrame = new AuthenticationFrame(accessControlMethod);
             authFrame.setVisible(true);
         });
         panel.add(switchUserButton);

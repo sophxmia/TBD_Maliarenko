@@ -11,10 +11,14 @@ class AuthenticationFrame extends JFrame {
     private JPasswordField passwordField;
     private static final String DATABASE_FILE = "src/maliarenko_database.csv";
 
-    public AuthenticationFrame() {
+    private final String accessControlMethod;
+
+    public AuthenticationFrame(String accessControlMethod) {
+        this.accessControlMethod = accessControlMethod;
         initializeFrame();
         addComponents();
     }
+
 
     private void initializeFrame() {
         setTitle("Автентифікація");
@@ -48,7 +52,7 @@ class AuthenticationFrame extends JFrame {
             String password = new String(passwordField.getPassword());
 
             if (authenticateUser(username, password)) {
-                MainFrame mainFrame = new MainFrame(username);
+                MainFrame mainFrame = new MainFrame(username, accessControlMethod);
                 mainFrame.setVisible(true);
                 dispose();
             } else {
