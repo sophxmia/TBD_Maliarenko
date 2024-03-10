@@ -1,7 +1,5 @@
 package org.example.main;
 
-import org.example.mandatoryAccess.ResourceWindow;
-
 import javax.swing.*;
 import java.awt.*;
 

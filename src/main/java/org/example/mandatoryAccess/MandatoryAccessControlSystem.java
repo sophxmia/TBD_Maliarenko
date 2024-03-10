@@ -2,13 +2,13 @@ package org.example.mandatoryAccess;
 
 import java.io.File;
 
-public class AccessControlSystem {
+public class MandatoryAccessControlSystem {
     private final UserManagementSystem userManagementSystem;
     private final ResourceManagementSystem resourceManagementSystem;
 
-    public AccessControlSystem(){
+    public MandatoryAccessControlSystem() {
         this.userManagementSystem = new UserManagementSystem();
-        this.resourceManagementSystem =  new ResourceManagementSystem();
+        this.resourceManagementSystem = new ResourceManagementSystem();
     }
 
     public boolean checkAccess(String username, String resourceName) {

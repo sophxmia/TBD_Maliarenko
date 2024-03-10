@@ -3,9 +3,11 @@ package org.example.main;
 import javax.swing.*;
 
 public class Main {
+    private static String accessControlMethod;
+
     public static void main(String[] args) {
         // Запитуємо користувача про метод розмежування доступу
-        String accessControlMethod = askForAccessControlMethod();
+        accessControlMethod = askForAccessControlMethod();
 
         SwingUtilities.invokeLater(() -> {
             AuthenticationFrame authFrame = new AuthenticationFrame();
