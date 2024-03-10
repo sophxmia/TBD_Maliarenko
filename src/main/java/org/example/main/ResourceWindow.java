@@ -53,19 +53,23 @@ public class ResourceWindow extends JFrame {
     }
 
     private void openFile(String filePath, String username) {
-        if (accessControlMethod.equals("Мандатне")) {
-            MandatoryAccessControlSystem accessControlSystem = new MandatoryAccessControlSystem();
-            if (accessControlSystem.hasAccess(username, filePath)) {
-                openFile(filePath);
-            } else {
-                showAccessError();
+        switch (accessControlMethod) {
+            case "Мандатне" -> {
+                MandatoryAccessControlSystem accessControlSystem = new MandatoryAccessControlSystem();
+                if (accessControlSystem.hasAccess(username, filePath)) {
+                    openFile(filePath);
+                } else {
+                    showAccessError();
+                }
             }
-        } else if (accessControlMethod.equals("Дискреційне")) {
-            DiscretionaryAccessControlSystem accessControlSystem = new DiscretionaryAccessControlSystem();
-        } else if (accessControlMethod.equals("Рольове")) {
-            RoleAccessControlSystem accessControlSystem = new RoleAccessControlSystem();
-        } else {
-            JOptionPane.showMessageDialog(this, "Непідтримуваний метод розмежування доступу", "Помилка", JOptionPane.ERROR_MESSAGE);
+            case "Дискреційне" -> {
+                DiscretionaryAccessControlSystem accessControlSystem = new DiscretionaryAccessControlSystem();
+            }
+            case "Рольове" -> {
+                RoleAccessControlSystem accessControlSystem = new RoleAccessControlSystem();
+            }
+            default ->
+                    JOptionPane.showMessageDialog(this, "Непідтримуваний метод розмежування доступу", "Помилка", JOptionPane.ERROR_MESSAGE);
         }
     }
 

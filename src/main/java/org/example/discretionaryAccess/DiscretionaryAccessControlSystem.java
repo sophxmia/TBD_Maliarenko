@@ -30,7 +30,7 @@ public class DiscretionaryAccessControlSystem {
                 accessMatrix.put(user, resourceAccess);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -47,7 +47,10 @@ public class DiscretionaryAccessControlSystem {
         LocalTime currentTime = LocalTime.now();
         LocalTime startTime = readStartTime(username, resourceName);
         LocalTime endTime = readEndTime(username, resourceName);
-
+        // Якщо часові межі не встановлено, то повертаємо true (тобто немає обмеження по часу)
+        if (startTime == null && endTime == null) {
+            return true;
+        }
         // Перевірка чи час наразі потрапляє в обмеження часу доступу
         return (startTime == null || currentTime.isAfter(startTime)) && (endTime == null || currentTime.isBefore(endTime));
     }
@@ -68,7 +71,7 @@ public class DiscretionaryAccessControlSystem {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         // Повертаємо null, якщо обмеження часу не встановлено
         return null;
@@ -90,7 +93,7 @@ public class DiscretionaryAccessControlSystem {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         // Повертаємо null, якщо обмеження часу не встановлено
         return null;
