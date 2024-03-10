@@ -75,6 +75,4 @@ public class AddUser extends JFrame {
                     "Помилка", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-
 }

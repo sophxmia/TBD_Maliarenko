@@ -21,9 +21,9 @@ public class MandatoryAccessControlSystem {
         }
 
         return switch (userAccessLevel) {
-            case "Низький" -> isLowAccessAllowed(resourceName);
-            case "Середній" -> isMediumAccessAllowed(resourceName);
-            case "Високий" -> isHighAccessAllowed();
+            case "Не таємно" -> isLowAccessAllowed(resourceName);
+            case "Таємно" -> isMediumAccessAllowed(resourceName);
+            case "Особливої важливості" -> isHighAccessAllowed();
             default -> false;
         };
     }
