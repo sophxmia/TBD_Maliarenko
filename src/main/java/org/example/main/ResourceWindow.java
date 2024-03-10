@@ -1,6 +1,8 @@
 package org.example.main;
 
 import org.example.mandatoryAccess.MandatoryAccessControlSystem;
+import org.example.discretionaryAccess.DiscretionaryAccessControlSystem;
+import org.example.roleAccess.RoleAccessControlSystem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +18,10 @@ public class ResourceWindow extends JFrame {
             "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/image.bmp"
     };
 
-    public ResourceWindow(String username) {
+    private final String accessControlMethod;
+
+    public ResourceWindow(String username, String accessControlMethod) {
+        this.accessControlMethod = accessControlMethod;
         initializeFrame();
         addResourceButtons(username);
     }
@@ -48,16 +53,33 @@ public class ResourceWindow extends JFrame {
     }
 
     private void openFile(String filePath, String username) {
-        MandatoryAccessControlSystem mandatoryAccessControlSystem = new MandatoryAccessControlSystem();
-        if (mandatoryAccessControlSystem.hasAccess(username, filePath)) {
-            File file = new File(filePath);
-            try {
-                Desktop.getDesktop().open(file);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Помилка при відкритті файлу", "Помилка", JOptionPane.ERROR_MESSAGE);
+        if (accessControlMethod.equals("Мандатне")) {
+            MandatoryAccessControlSystem accessControlSystem = new MandatoryAccessControlSystem();
+            if (accessControlSystem.hasAccess(username, filePath)) {
+                openFile(filePath);
+            } else {
+                showAccessError();
             }
+        } else if (accessControlMethod.equals("Дискреційне")) {
+            DiscretionaryAccessControlSystem accessControlSystem = new DiscretionaryAccessControlSystem();
+        } else if (accessControlMethod.equals("Рольове")) {
+            RoleAccessControlSystem accessControlSystem = new RoleAccessControlSystem();
         } else {
-            JOptionPane.showMessageDialog(this, "Недостатньо прав для доступу до цього ресурсу", "Помилка", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Непідтримуваний метод розмежування доступу", "Помилка", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void openFile(String filePath) {
+        File file = new File(filePath);
+        try {
+            Desktop.getDesktop().open(file);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Помилка при відкритті файлу", "Помилка", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showAccessError() {
+        JOptionPane.showMessageDialog(this, "Недостатньо прав для доступу до цього ресурсу", "Помилка", JOptionPane.ERROR_MESSAGE);
+    }
 }
+

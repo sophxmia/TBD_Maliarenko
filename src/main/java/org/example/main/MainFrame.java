@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
 
         JButton openResourcesButton = new JButton("Відкрити ресурси");
         openResourcesButton.addActionListener(e -> {
-            ResourceWindow resourceWindow = new ResourceWindow(username);
+            ResourceWindow resourceWindow = new ResourceWindow(username, accessControlMethod);
             resourceWindow.setVisible(true);
         });
         panel.add(openResourcesButton);
