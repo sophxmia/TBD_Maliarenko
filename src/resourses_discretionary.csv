@@ -1,0 +1,8 @@
+Користувач\Ресурс,file1.txt,file2.txt,file3.txt,file.exe,image.bmp
+Maliarenko_1,Read/Write,No Access,No Access,Execute,Read/Write
+Maliarenko_2,Read/Write,Read/Write,No Access,No Access,No Access
+Maliarenko_3,Read,Read,Read,No Access,Read/Write
+Maliarenko_4,Read,Read,No Access,Execute,No Access
+Maliarenko_5,No Access,Read,Read,Execute,Read
+
+

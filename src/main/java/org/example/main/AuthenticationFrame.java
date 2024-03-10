@@ -2,22 +2,28 @@ package org.example.main;
 
 import javax.swing.*;
 import java.awt.*;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
 class AuthenticationFrame extends JFrame {
-    private final JTextField usernameField;
-    private final JPasswordField passwordField;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
     private static final String DATABASE_FILE = "src/maliarenko_database.csv";
 
     public AuthenticationFrame() {
+        initializeFrame();
+        addComponents();
+    }
+
+    private void initializeFrame() {
         setTitle("Автентифікація");
         setSize(300, 150);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
 
+    private void addComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 2));
 
@@ -29,13 +35,13 @@ class AuthenticationFrame extends JFrame {
         passwordField = new JPasswordField();
         panel.add(passwordField);
 
-        JButton loginButton = getjButton();
+        JButton loginButton = createLoginButton();
         panel.add(loginButton);
 
         add(panel);
     }
 
-    private JButton getjButton() {
+    private JButton createLoginButton() {
         JButton loginButton = new JButton("Увійти");
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
@@ -67,5 +73,4 @@ class AuthenticationFrame extends JFrame {
         }
         return false;
     }
-
 }
