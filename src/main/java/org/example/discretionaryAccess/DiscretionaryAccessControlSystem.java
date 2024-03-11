@@ -51,20 +51,20 @@ public class DiscretionaryAccessControlSystem {
         System.out.println("Access for " + username + " to " + resource + ": " + access);
         if (access != null) {
 
-            switch (access) {
-                case "Read":
+            return switch (access) {
+                case "Read" ->
                     // Перевіряємо, чи є доступ на читання
-                    return true;
-                case "Read/Write":
+                        true;
+                case "Read/Write" ->
                     // Перевіряємо, чи є доступ на читання та запис
-                    return true;
-                case "Execute":
+                        true;
+                case "Execute" ->
                     // Перевіряємо, чи є доступ на виконання
-                    return true;
-                default:
+                        true;
+                default ->
                     // Перевіряємо, чи є обмеження на доступ
-                    return false;
-            }
+                        false;
+            };
         }
         return false;
     }
