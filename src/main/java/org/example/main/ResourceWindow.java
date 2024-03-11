@@ -64,9 +64,19 @@ public class ResourceWindow extends JFrame {
             }
             case "Дискреційне" -> {
                 DiscretionaryAccessControlSystem accessControlSystem = new DiscretionaryAccessControlSystem();
+                if (accessControlSystem.hasAccess(username, filePath)) {
+                    openFile(filePath);
+                } else {
+                    showAccessError();
+                }
             }
             case "Рольове" -> {
                 RoleAccessControlSystem accessControlSystem = new RoleAccessControlSystem();
+                if (accessControlSystem.hasAccess(username, filePath)) {
+                    openFile(filePath);
+                } else {
+                    showAccessError();
+                }
             }
             default ->
                     JOptionPane.showMessageDialog(this, "Непідтримуваний метод розмежування доступу", "Помилка", JOptionPane.ERROR_MESSAGE);

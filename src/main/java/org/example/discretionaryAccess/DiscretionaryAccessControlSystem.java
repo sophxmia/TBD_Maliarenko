@@ -1,101 +1,76 @@
 package org.example.discretionaryAccess;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DiscretionaryAccessControlSystem {
-    private static final String RESOURCE_FILE = "resources_discretionary.csv";
+    private static final String RESOURCE_FILE = "src/resourses_discretionary.csv";
+
     private final Map<String, Map<String, String>> accessMatrix;
 
     public DiscretionaryAccessControlSystem() {
-        accessMatrix = new HashMap<>();
-        loadAccessMatrix();
+        accessMatrix = loadAccessMatrix();
     }
 
-    private void loadAccessMatrix() {
+    private Map<String, Map<String, String>> loadAccessMatrix() {
+        Map<String, Map<String, String>> accessMatrix = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(RESOURCE_FILE))) {
+            String headerLine = reader.readLine();
+            if (headerLine == null) {
+                throw new IOException("Файл resources_discretionary.csv порожній");
+            }
+            String[] resourceNames = headerLine.split(",");
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                String user = parts[0];
+                String username = parts[0];
                 Map<String, String> resourceAccess = new HashMap<>();
                 for (int i = 1; i < parts.length; i++) {
-                    String[] access = parts[i].split("/");
-                    resourceAccess.put(access[0], access[1]);
+                    resourceAccess.put(resourceNames[i].trim(), parts[i].trim());
                 }
-                accessMatrix.put(user, resourceAccess);
+                accessMatrix.put(username, resourceAccess);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        System.out.println(accessMatrix);
+        return accessMatrix;
     }
 
-    public boolean hasAccess(String username, String resourceName, String action) {
-        Map<String, String> resourceAccess = accessMatrix.get(username);
-        if (resourceAccess != null && resourceAccess.containsKey(resourceName)) {
-            String permissions = resourceAccess.get(resourceName);
-            return permissions.contains(action) && checkTimeConstraints(username, resourceName);
+    public boolean hasAccess(String username, String filePath) {
+        String resource = getResourceNameFromFilePath(filePath);
+        Map<String, String> userAccess = accessMatrix.get(username);
+        if (userAccess == null) {
+            return false;
+        }
+        String access = userAccess.get(resource);
+        System.out.println("Access for " + username + " to " + resource + ": " + access);
+        if (access != null) {
+
+            switch (access) {
+                case "Read":
+                    // Перевіряємо, чи є доступ на читання
+                    return true;
+                case "Read/Write":
+                    // Перевіряємо, чи є доступ на читання та запис
+                    return true;
+                case "Execute":
+                    // Перевіряємо, чи є доступ на виконання
+                    return true;
+                default:
+                    // Перевіряємо, чи є обмеження на доступ
+                    return false;
+            }
         }
         return false;
     }
 
-    private boolean checkTimeConstraints(String username, String resourceName) {
-        LocalTime currentTime = LocalTime.now();
-        LocalTime startTime = readStartTime(username, resourceName);
-        LocalTime endTime = readEndTime(username, resourceName);
-        // Якщо часові межі не встановлено, то повертаємо true (тобто немає обмеження по часу)
-        if (startTime == null && endTime == null) {
-            return true;
-        }
-        // Перевірка чи час наразі потрапляє в обмеження часу доступу
-        return (startTime == null || currentTime.isAfter(startTime)) && (endTime == null || currentTime.isBefore(endTime));
-    }
-
-    private LocalTime readStartTime(String username, String resourceName) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(RESOURCE_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts[0].equals(username)) {
-                    for (int i = 1; i < parts.length; i++) {
-                        String[] resourceAccess = parts[i].split("/");
-                        if (resourceAccess[0].equals(resourceName)) {
-                            // Повертаємо початковий час доступу, якщо встановлено
-                            return LocalTime.parse(resourceAccess[2]);
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // Повертаємо null, якщо обмеження часу не встановлено
-        return null;
-    }
-
-    private LocalTime readEndTime(String username, String resourceName) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(RESOURCE_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts[0].equals(username)) {
-                    for (int i = 1; i < parts.length; i++) {
-                        String[] resourceAccess = parts[i].split("/");
-                        if (resourceAccess[0].equals(resourceName)) {
-                            // Повертаємо кінцевий час доступу, якщо встановлено
-                            return LocalTime.parse(resourceAccess[3]);
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // Повертаємо null, якщо обмеження часу не встановлено
-        return null;
+    private String getResourceNameFromFilePath(String filePath) {
+        File file = new File(filePath);
+        return file.getName();
     }
 }
