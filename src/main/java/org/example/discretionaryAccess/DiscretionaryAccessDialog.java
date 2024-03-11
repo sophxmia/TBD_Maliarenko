@@ -2,8 +2,6 @@ package org.example.discretionaryAccess;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -37,12 +35,9 @@ public class DiscretionaryAccessDialog extends JDialog {
         }
 
         JButton saveButton = new JButton("Зберегти");
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveAccess();
-                dispose();
-            }
+        saveButton.addActionListener(e -> {
+            saveAccess();
+            dispose();
         });
 
         add(panel, BorderLayout.CENTER);
@@ -75,9 +70,7 @@ public class DiscretionaryAccessDialog extends JDialog {
 
     // Метод для запиту користувача про часове обмеження
     private String askForTimeLimit() {
-        String timeLimit = JOptionPane.showInputDialog(this, "Введіть часове обмеження (ISO формат дати, наприклад, 2024-03-20):");
-        // Тут ви також можете виконати перевірку правильності формату дати
-        return timeLimit;
+        return JOptionPane.showInputDialog(this, "Введіть часове обмеження (ISO формат дати, наприклад, 2024-03-20):");
     }
 
 }

@@ -21,7 +21,9 @@ public class UserManagementSystem {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
-                users.add(new User(parts[0], parts[1], parts[2], parts[3]));
+                if (parts.length >= 4) { // Перевірка на кількість елементів
+                    users.add(new User(parts[0], parts[1], parts[2], parts[3]));
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
