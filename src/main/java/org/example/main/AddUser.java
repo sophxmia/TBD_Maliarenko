@@ -1,5 +1,7 @@
 package org.example.main;
 
+import org.example.discretionaryAccess.DiscretionaryAccessDialog;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -9,6 +11,7 @@ public class AddUser extends JFrame {
     private final JTextField passwordField;
     private final JCheckBox complexPasswordCheckbox;
     private final JTextField accessLevelField;
+    private final JCheckBox discretionaryAccessCheckbox;
     private static final String DATABASE_FILE = "src/maliarenko_database.csv";
 
     public AddUser() {
@@ -18,7 +21,7 @@ public class AddUser extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 2));
+        panel.setLayout(new GridLayout(6, 2));
         panel.add(new Label("Ім'я користувача:"));
         usernameField = new JTextField();
         panel.add(usernameField);
@@ -35,6 +38,11 @@ public class AddUser extends JFrame {
         accessLevelField = new JTextField();
         panel.add(accessLevelField);
 
+        panel.add(new JLabel("Дискреційний доступ:"));
+        discretionaryAccessCheckbox = new JCheckBox();
+        panel.add(discretionaryAccessCheckbox);
+
+
         JButton addUserButton = getjButton();
         panel.add(addUserButton);
 
@@ -48,6 +56,10 @@ public class AddUser extends JFrame {
             String password = passwordField.getText();
             boolean isComplex = complexPasswordCheckbox.isSelected();
             String accessLevel = accessLevelField.getText();
+            if (discretionaryAccessCheckbox.isSelected()) {
+                // Якщо вибраний чекбокс дискреційного доступу, відкриваємо вікно для встановлення прав доступу
+                new DiscretionaryAccessDialog(AddUser.this, username);
+            }
             addUser(username, password, isComplex, accessLevel);
         });
         return addUserButton;
