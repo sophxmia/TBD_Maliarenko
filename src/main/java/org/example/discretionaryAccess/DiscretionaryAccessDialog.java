@@ -53,12 +53,15 @@ public class DiscretionaryAccessDialog extends JDialog {
         setVisible(true);
     }
 
+    // Внесіть зміни у ваш метод saveAccess ()
     private void saveAccess() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(RESOURCE_FILE, true))) {
             writer.write(username);
             for (int i = 0; i < resourceCheckboxes.length; i++) {
                 if (resourceCheckboxes[i].isSelected()) {
-                    writer.write("," + accessComboBoxes[i].getSelectedItem());
+                    String accessType = (String) accessComboBoxes[i].getSelectedItem();
+                    String timeLimit = askForTimeLimit(); // Запитайте користувача про часове обмеження
+                    writer.write("," + accessType + "|" + timeLimit); // Збережіть тип доступу та часове обмеження
                 } else {
                     writer.write(",No Access");
                 }
@@ -69,4 +72,12 @@ public class DiscretionaryAccessDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "Помилка під час запису до файлу дискреційного доступу.", "Помилка", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    // Метод для запиту користувача про часове обмеження
+    private String askForTimeLimit() {
+        String timeLimit = JOptionPane.showInputDialog(this, "Введіть часове обмеження (ISO формат дати, наприклад, 2024-03-20):");
+        // Тут ви також можете виконати перевірку правильності формату дати
+        return timeLimit;
+    }
+
 }
