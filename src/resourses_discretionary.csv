@@ -1,6 +1,6 @@
-Користувач\Ресурс,file1.txt,file2.txt,file3.txt,file.exe,image.bmp
-Maliarenko_1,Read/Write,No Access,No Access,Execute,Read/Write
-Maliarenko_2,Read/Write,Read/Write,No Access,No Access,No Access
-Maliarenko_3,Read,Read,Read,No Access,Read/Write
-Maliarenko_4,Read,Read,No Access,Execute,No Access
-Maliarenko_5,No Access,Read,Read,Execute,Read
+username,file1.txt,file2.txt,file3.txt,file.exe,image.bmp
+Maliarenko_1,Read/Write|2024-03-10,Read/Write,Read,Execute,No Access
+Maliarenko_2,Read/Write|2022-03-12,Read/Write|2024-03-15,Read,Execute,Read/Write|2024-03-14
+Maliarenko_3,Read|2024-03-11,Read|2024-03-10,Read|2024-03-09,Execute,No Access
+Maliarenko_4,Read|2024-03-14,Read|2024-03-12,No Access,Execute,No Access
+Maliarenko_5,No Access,Read,Read,Execute|2024-03-15,Read

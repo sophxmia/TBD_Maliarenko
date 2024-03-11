@@ -4,20 +4,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DiscretionaryAccessControlSystem {
     private static final String RESOURCE_FILE = "src/resourses_discretionary.csv";
 
-    private final Map<String, Map<String, String>> accessMatrix;
+    private final Map<String, Map<String, ResourceAccess>> accessMatrix;
 
     public DiscretionaryAccessControlSystem() {
         accessMatrix = loadAccessMatrix();
     }
 
-    private Map<String, Map<String, String>> loadAccessMatrix() {
-        Map<String, Map<String, String>> accessMatrix = new HashMap<>();
+    private Map<String, Map<String, ResourceAccess>> loadAccessMatrix() {
+        Map<String, Map<String, ResourceAccess>> accessMatrix = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(RESOURCE_FILE))) {
             String headerLine = reader.readLine();
             if (headerLine == null) {
@@ -28,9 +30,12 @@ public class DiscretionaryAccessControlSystem {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 String username = parts[0];
-                Map<String, String> resourceAccess = new HashMap<>();
+                Map<String, ResourceAccess> resourceAccess = new HashMap<>();
                 for (int i = 1; i < parts.length; i++) {
-                    resourceAccess.put(resourceNames[i].trim(), parts[i].trim());
+                    String[] accessParts = parts[i].trim().split("\\|");
+                    String accessType = accessParts[0];
+                    String timeLimit = accessParts.length > 1 ? accessParts[1] : null;
+                    resourceAccess.put(resourceNames[i].trim(), new ResourceAccess(accessType, timeLimit));
                 }
                 accessMatrix.put(username, resourceAccess);
             }
@@ -43,31 +48,43 @@ public class DiscretionaryAccessControlSystem {
 
     public boolean hasAccess(String username, String filePath) {
         String resource = getResourceNameFromFilePath(filePath);
-        Map<String, String> userAccess = accessMatrix.get(username);
+        Map<String, ResourceAccess> userAccess = accessMatrix.get(username);
         if (userAccess == null) {
             return false;
         }
-        String access = userAccess.get(resource);
-        System.out.println("Access for " + username + " to " + resource + ": " + access);
-        if (access != null) {
-
-            return switch (access) {
-                case "Read" ->
-                    // Перевіряємо, чи є доступ на читання
-                        true;
-                case "Read/Write" ->
-                    // Перевіряємо, чи є доступ на читання та запис
-                        true;
-                case "Execute" ->
-                    // Перевіряємо, чи є доступ на виконання
-                        true;
-                default ->
-                    // Перевіряємо, чи є обмеження на доступ
-                        false;
-            };
+        ResourceAccess access = userAccess.get(resource);
+        System.out.println("Access for " + username + " to " + resource + ": " + access.getAccessType() + " | Time limit: " + access.getTimeLimit());
+        // Перевірка обмеження по часу
+        if (access.getTimeLimit() != null && !isTimeLimitExpired(access.getTimeLimit())) {
+            return false; // Часовий ліміт сплив
         }
-        return false;
+        return switch (access.getAccessType()) {
+            case "Read" -> true;
+            case "Read/Write" -> true;
+            case "Execute" -> true;
+            default -> false;
+        };
     }
+
+    private boolean isTimeLimitExpired(String timeLimit) {
+        if (timeLimit == null || timeLimit.isEmpty()) {
+            // Якщо часовий ліміт не вказаний, вважаємо, що він не сплив
+            return false;
+        }
+
+        LocalDate expiryDate;
+        try {
+            expiryDate = LocalDate.parse(timeLimit, DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (Exception e) {
+            // Неправильний формат дати, тому не можемо його перевірити
+            return false;
+        }
+
+        // Перевіряємо, чи часовий ліміт для доступу accessType ще не сплив
+        LocalDate currentDate = LocalDate.now();
+        return currentDate.isBefore(expiryDate) || currentDate.isEqual(expiryDate);
+    }
+
 
     private String getResourceNameFromFilePath(String filePath) {
         File file = new File(filePath);
