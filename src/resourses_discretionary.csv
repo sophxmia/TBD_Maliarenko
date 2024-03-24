@@ -1,7 +1,7 @@
 username,file1.txt,file2.txt,file3.txt,file.exe,image.bmp
-Maliarenko_1,Read/Write|2024-03-10,Read/Write,Read,Execute,No Access
+Maliarenko_1,Read/Write|2022-03-10,Read/Write,Read,Execute,No Access
 Maliarenko_2,Read/Write|2022-03-12,Read/Write|2024-03-15,Read,Execute,Read/Write|2024-03-14
 Maliarenko_3,Read|2024-03-11,Read|2024-03-10,Read|2024-03-09,Execute,No Access
 Maliarenko_4,Read|2024-03-14,Read|2024-03-12,No Access,Execute,No Access
 Maliarenko_5,No Access,Read,Read,Execute|2024-03-15,Read
-
+zahyst,Read|2024-03-21,No Access|,No Access|,No Access|,No Access|
