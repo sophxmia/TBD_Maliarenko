@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,6 +62,16 @@ public class RoleAccessControlSystem {
         if (resourceAccess == null) {
             return false; // Роль не знайдена у матриці доступу
         }
+
+        if (role.equals("Користувач")) {
+            LocalTime currentTime = LocalTime.now();
+            LocalTime startTime = LocalTime.of(9, 0); // Початок робочого дня
+            LocalTime endTime = LocalTime.of(18, 0); // Кінець робочого дня
+            if (currentTime.isBefore(startTime) || currentTime.isAfter(endTime)) {
+                return false; // Поза робочим часом
+            }
+        }
+
         String resourceName = getResourceNameFromFilePath(resource);
         Boolean access = resourceAccess.get(resourceName);
         return access != null && access; // Повертаємо доступність ресурсу для користувача
