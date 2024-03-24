@@ -1,6 +1,9 @@
 package org.example.roleAccess;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,10 +72,23 @@ public class RoleAccessControlSystem {
     }
 
     private String getRole(String username) {
-        return switch (username) {
-            case "Maliarenko_3", "Maliarenko_4" -> "Редактор";
-            case "Maliarenko_5" -> "Адміністратор";
-            default -> "Користувач";
-        };
+        String csvFile = "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/TBD_Maliarenko/src/roleAccess.csv";
+        String line;
+        String delimiter = ",";
+        String role = "Користувач";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(delimiter);
+                if (parts.length == 2 && parts[0].equals(username)) {
+                    role = parts[1];
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(role);
+        return role;
     }
 }
