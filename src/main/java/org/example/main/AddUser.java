@@ -15,6 +15,7 @@ public class AddUser extends JFrame {
     private final JCheckBox discretionaryAccessCheckbox;
     private static final String DATABASE_FILE = "src/maliarenko_database.csv";
     private static final String csvFile = "src/roleAccess.csv";
+    private static int adminCount = 0;
 
     public AddUser() {
         setTitle("Додати нового користувача");
@@ -68,9 +69,18 @@ public class AddUser extends JFrame {
                 new DiscretionaryAccessDialog(AddUser.this, username);
             }
             if (role != null) {
+                checkAdminExistence();
+                // Перевірка кількості адміністраторів, перш ніж додавати нового
+                if (role.equals("Адміністратор") && adminCount >= 2) {
+                    JOptionPane.showMessageDialog(AddUser.this,
+                            "Досягнуто максимальну кількість адміністраторів у системі.",
+                            "Помилка", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 addUser(username, password, isComplex, role);
+            } else {
+                addUser(username, password, isComplex, accessLevel);
             }
-            addUser(username, password, isComplex, accessLevel);
         });
         return addUserButton;
     }
@@ -99,6 +109,10 @@ public class AddUser extends JFrame {
             }
         }
 
+        if (access.equals("Адміністратор")) {
+            adminCount++;
+        }
+
         PasswordUtils.validatePasswordComplexity(isComplex, password);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATABASE_FILE, true))) {
@@ -112,4 +126,20 @@ public class AddUser extends JFrame {
                     "Помилка", JOptionPane.ERROR_MESSAGE);
         }
     }
+    private boolean checkAdminExistence() {
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2 && parts[1].equals("Адміністратор")) {
+                    adminCount++;
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
