@@ -81,22 +81,30 @@ public class BruteForceDialog extends JDialog {
         }
 
         // Початок процесу підбору пароля
-        generatePasswords(username,"", length, characterList);
+        long startTime = System.nanoTime();
+        String password = generatePasswords(username, "", length, characterList);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime) / 1_000_000; // переводимо в мілісекунди
+
+        JOptionPane.showMessageDialog(this, "Пароль для користувача " + username + " знайдений: " + password + "\nЧас пошуку: " + duration + " мс");
+        dispose();
     }
 
-    private void generatePasswords(String username, String prefix, int length, List<Character> characterList) {
+    private String generatePasswords(String username, String prefix, int length, List<Character> characterList) {
         if (length == 0) {
-            System.out.println(prefix);
             if (authenticateUser(username, prefix)) {
-                JOptionPane.showMessageDialog(this, "Пароль для користувача " + username + " знайдений: " + prefix);
-                dispose();
+                return prefix;
             }
-            return;
+            return null;
         }
 
         for (char character : characterList) {
-            generatePasswords(username, prefix + character, length - 1, characterList);
+            String password = generatePasswords(username, prefix + character, length - 1, characterList);
+            if (password != null) {
+                return password;
+            }
         }
+        return null;
     }
 
     private boolean authenticateUser(String username, String password) {
