@@ -49,34 +49,45 @@ public class BruteForceDialog extends JDialog {
 
     private void startBruteForce(String username) {
         // Отримання введених параметрів підбору пароля
-        int length = Integer.parseInt(lengthField.getText());
+        int length;
+        try {
+            length = Integer.parseInt(lengthField.getText());
+        } catch (NumberFormatException ex) {
+            length = -1; // Позначає, що довжина пароля не відома
+        }
+
         boolean includeDigits = digitsCheckbox.isSelected();
         boolean includeSpecialCharacters = specialCharactersCheckbox.isSelected();
         boolean includeLowercaseLetters = lowercaseLettersCheckbox.isSelected();
         boolean includeUppercaseLetters = uppercaseLettersCheckbox.isSelected();
 
+        // Перевірка на відомість наборів символів
+        boolean anyCharacterSetSelected = includeDigits || includeSpecialCharacters || includeLowercaseLetters || includeUppercaseLetters;
+
         // Генерація списку всіх можливих символів для підбору
         List<Character> characterList = new ArrayList<>();
-        if (includeDigits) {
-            for (char digit = '0'; digit <= '9'; digit++) {
-                characterList.add(digit);
+        if (anyCharacterSetSelected) {
+            if (includeDigits) {
+                for (char digit = '0'; digit <= '9'; digit++) {
+                    characterList.add(digit);
+                }
             }
-        }
-        if (includeSpecialCharacters) {
-            // Додати спеціальні символи
-            char[] specialCharacters = "!@#$%^&*()-_=+[]{};:'\"\\|,.<>?/".toCharArray();
-            for (char character : specialCharacters) {
-                characterList.add(character);
+            if (includeSpecialCharacters) {
+                // Додати спеціальні символи
+                char[] specialCharacters = "!@#$%^&*()-_=+[]{};:'\"\\|,.<>?/".toCharArray();
+                for (char character : specialCharacters) {
+                    characterList.add(character);
+                }
             }
-        }
-        if (includeLowercaseLetters) {
-            for (char letter = 'a'; letter <= 'z'; letter++) {
-                characterList.add(letter);
+            if (includeLowercaseLetters) {
+                for (char letter = 'a'; letter <= 'z'; letter++) {
+                    characterList.add(letter);
+                }
             }
-        }
-        if (includeUppercaseLetters) {
-            for (char letter = 'A'; letter <= 'Z'; letter++) {
-                characterList.add(letter);
+            if (includeUppercaseLetters) {
+                for (char letter = 'A'; letter <= 'Z'; letter++) {
+                    characterList.add(letter);
+                }
             }
         }
 
@@ -98,6 +109,33 @@ public class BruteForceDialog extends JDialog {
             return null;
         }
 
+        // Перевірка на відомість довжини пароля
+        if (length < 0) {
+            // Якщо довжина не відома, пробуємо різні довжини
+            for (int i = 1; i <= 8; i++) { // Припустимо, що максимальна довжина пароля - 8 символів
+                String password = generatePasswords(username, prefix, i, characterList);
+                if (password != null) {
+                    return password;
+                }
+            }
+            return null;
+        }
+        if (characterList.isEmpty()) {
+            // Якщо набір символів не вказаний, використовуємо всі можливі символи
+            for (char digit = '0'; digit <= '9'; digit++) {
+                characterList.add(digit);
+            }
+            char[] specialCharacters = "!@#$%^&*()-_=+[]{};:'\"\\|,.<>?/".toCharArray();
+            for (char character : specialCharacters) {
+                characterList.add(character);
+            }
+            for (char letter = 'a'; letter <= 'z'; letter++) {
+                characterList.add(letter);
+            }
+            for (char letter = 'A'; letter <= 'Z'; letter++) {
+                characterList.add(letter);
+            }
+        }
         for (char character : characterList) {
             String password = generatePasswords(username, prefix + character, length - 1, characterList);
             if (password != null) {
@@ -106,6 +144,7 @@ public class BruteForceDialog extends JDialog {
         }
         return null;
     }
+
 
     private boolean authenticateUser(String username, String password) {
         String DATABASE_FILE = "src/maliarenko_database.csv";
