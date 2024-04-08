@@ -1,5 +1,7 @@
 package org.example.main;
 
+import org.example.passwordCracker.BruteForceDialog;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -13,7 +15,6 @@ public class MainFrame extends JFrame {
         addComponents(username);
     }
 
-
     private void initializeFrame(String username) {
         setTitle("TBD_Maliarenko - " + username);
         setSize(500, 500);
@@ -24,7 +25,7 @@ public class MainFrame extends JFrame {
 
     private void addComponents(String username) {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 2));
+        panel.setLayout(new GridLayout(3, 2));
 
         JButton addUserButton = new JButton("Додати Користувача");
         addUserButton.addActionListener(e -> {
@@ -53,6 +54,14 @@ public class MainFrame extends JFrame {
             authFrame.setVisible(true);
         });
         panel.add(switchUserButton);
+
+        JButton bruteForceButton = new JButton("Підібрати пароль");
+        bruteForceButton.addActionListener(e -> {
+            BruteForceDialog bruteForceDialog = new BruteForceDialog(username);
+            bruteForceDialog.setVisible(true);
+        });
+        panel.add(bruteForceButton);
+
 
         add(panel);
     }

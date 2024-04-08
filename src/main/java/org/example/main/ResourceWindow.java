@@ -11,11 +11,11 @@ import java.io.File;
 public class ResourceWindow extends JFrame {
 
     private final String[] resourcePaths = {
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file1.txt",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file2.txt",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file3.txt",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/file.exe",
-            "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/Data/image.bmp"
+            "C:/Users/marsh/Desktop/8 sem/Технології безпечного доступу/TBD_Maliarenko/Data/file1.txt",
+            "C:/Users/marsh/Desktop/8 sem/Технології безпечного доступу/TBD_Maliarenko/Data/file2.txt",
+            "C:/Users/marsh/Desktop/8 sem/Технології безпечного доступу/TBD_Maliarenko/Data/file3.txt",
+            "C:/Users/marsh/Desktop/8 sem/Технології безпечного доступу/TBD_Maliarenko/Data/file.exe",
+            "C:/Users/marsh/Desktop/8 sem/Технології безпечного доступу/TBD_Maliarenko/Data/image.bmp"
     };
 
     private final String accessControlMethod;
