@@ -2,6 +2,9 @@ package org.example.passwordCracker;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,18 +81,39 @@ public class BruteForceDialog extends JDialog {
         }
 
         // Початок процесу підбору пароля
-        generatePasswords("", length, characterList);
+        generatePasswords(username,"", length, characterList);
     }
 
-    private void generatePasswords(String prefix, int length, List<Character> characterList) {
+    private void generatePasswords(String username, String prefix, int length, List<Character> characterList) {
         if (length == 0) {
-            System.out.println(prefix); // Вивести знайдений пароль
+            System.out.println(prefix);
+            if (authenticateUser(username, prefix)) {
+                JOptionPane.showMessageDialog(this, "Пароль для користувача " + username + " знайдений: " + prefix);
+                dispose();
+            }
             return;
         }
 
         for (char character : characterList) {
-            generatePasswords(prefix + character, length - 1, characterList);
+            generatePasswords(username, prefix + character, length - 1, characterList);
         }
+    }
+
+    private boolean authenticateUser(String username, String password) {
+        String DATABASE_FILE = "src/maliarenko_database.csv";
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts[0].equals(username) && parts[1].equals(password)) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
     }
 }
 
