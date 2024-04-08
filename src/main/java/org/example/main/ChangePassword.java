@@ -3,8 +3,9 @@ package org.example.main;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChangePassword extends JFrame {
@@ -12,6 +13,7 @@ public class ChangePassword extends JFrame {
     private JTextField oldPasswordField;
     private JTextField newPasswordField;
     private JCheckBox complexPasswordCheckbox;
+    private JTextField expiryDaysField; // Додано поле для введення терміну дії паролів
     private static final String DATABASE_FILE = "src/maliarenko_database.csv";
     private static final String OLD_PASSWORDS_FILE = "src/maliarenko_old_passwords.csv";
 
@@ -31,7 +33,7 @@ public class ChangePassword extends JFrame {
 
     private JPanel createPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 2));
+        panel.setLayout(new GridLayout(6, 2)); // Змінено кількість рядків на 6
         return panel;
     }
 
@@ -49,13 +51,17 @@ public class ChangePassword extends JFrame {
         panel.add(new JLabel("Складний пароль:"));
         complexPasswordCheckbox = new JCheckBox();
         panel.add(complexPasswordCheckbox);
+        panel.add(new JLabel("Термін дії паролю (дні):")); // Додано мітку для нового поля
+        expiryDaysField = new JTextField("30"); // Встановлення значення за замовчуванням 30 днів
+        panel.add(expiryDaysField);
         JButton changePasswordButton = new JButton("Змінити пароль");
         changePasswordButton.addActionListener(e -> {
             String username = (String) usernameDropdown.getSelectedItem();
             String oldPassword = oldPasswordField.getText();
             String newPassword = newPasswordField.getText();
             boolean isComplex = complexPasswordCheckbox.isSelected();
-            changeUserPassword(username, oldPassword, newPassword, isComplex);
+            int expiryDays = Integer.parseInt(expiryDaysField.getText()); // Отримання значення терміну дії пароля
+            changeUserPassword(username, oldPassword, newPassword, isComplex, expiryDays);
         });
         panel.add(changePasswordButton);
     }
@@ -74,92 +80,56 @@ public class ChangePassword extends JFrame {
         return usernames;
     }
 
-    private void changeUserPassword(String username, String oldPassword, String newPassword, boolean isComplexNew) {
-        try {
-            // Check complexity requirements
-            if (isComplexNew && isUserRequiresComplexPassword(username)) {
-                showError("Користувачі з рівнями доступу 'Середній' та 'Високий' повинні мати складний пароль.");
-                return;
-            }
-            PasswordUtils.validatePasswordComplexity(isComplexNew, newPassword);
-
-            // Check if the new password is not among the last three old passwords
-            String[] oldPasswords = getOldPasswords(username);
-            if (Arrays.asList(oldPasswords).contains(newPassword)) {
-                showError("Новий пароль не може співпадати з попередніми трьома старими паролями.");
-                return;
-            }
-
-            // Update password in database
-            updateUserPasswordInDatabase(username, oldPassword, newPassword, isComplexNew);
-
-            // Save the new password to the list of old passwords
-            saveOldPasswords(username, newPassword, oldPasswords);
-        } catch (IOException e) {
-            showError("Помилка під час зміни паролю.");
-        } catch (IllegalArgumentException ex) {
-            showError(ex.getMessage());
-        }
-    }
-
-    private boolean isUserRequiresComplexPassword(String username) throws IOException {
-        String accessLevel = getAccessLevel(username);
-        return accessLevel.equals("Середній") || accessLevel.equals("Високий");
-    }
-
-    private void updateUserPasswordInDatabase(String username, String oldPassword, String newPassword, boolean isComplexNew) throws IOException {
-        boolean userFound = false;
+    private void changeUserPassword(String username, String oldPassword, String newPassword, boolean isComplexNew, int expiryDays) {
+        String lastPasswordChangeDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String[] oldPasswords = getOldPasswords(username);
+        boolean passwordChanged = false;
         try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_FILE));
              BufferedWriter writer = new BufferedWriter(new FileWriter(DATABASE_FILE + ".tmp"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
-                if (parts.length >= 1 && parts[0].equals(username)) {
-                    userFound = true;
-                    if (parts.length == 1) {
-                        writer.write(username + ":" + newPassword + ":" + (isComplexNew ? "Complex" : "Simple"));
-                    } else if (parts.length == 3 && parts[1].equals(oldPassword)) {
-                        writer.write(username + ":" + newPassword + ":" + (isComplexNew ? "Complex" : "Simple") + ":" + parts[2]);
+                if (parts[0].equals(username) && parts[1].equals(oldPassword)) {
+                    if (!isOldPassword(username, newPassword)) { // Перевірка, чи не є новий пароль старим
+                        writer.write(username + ":" + newPassword + ":" + (isComplexNew ? "Complex" : "Simple") + ":" + expiryDays + ":" + lastPasswordChangeDate);
+                        passwordChanged = true;
                     } else {
-                        writer.write(line);
+                        showError("Новий пароль збігається з одним з останніх трьох старих паролів.");
                     }
-                    writer.newLine();
                 } else {
                     writer.write(line);
-                    writer.newLine();
                 }
+                writer.newLine();
             }
+        } catch (IOException e) {
+            showError("Помилка під час зміни паролю.");
+        } catch (IllegalArgumentException ex) {
+            showError(ex.getMessage());
         }
-
-        if (!userFound) {
-            showError("Користувача з ім'ям " + username + " не знайдено.");
-            return;
-        }
-
-        File originalFile = new File(DATABASE_FILE);
-        File tempFile = new File(DATABASE_FILE + ".tmp");
-        if (!originalFile.delete()) {
-            showError("Помилка під час видалення оригінального файлу.");
-            return;
-        }
-        if (!tempFile.renameTo(originalFile)) {
-            showError("Помилка під час перейменування файлу.");
+        if (passwordChanged) {
+            saveOldPasswords(username, newPassword, oldPasswords);
+            // Видалення оригінального файлу та перейменування тимчасового файлу
+            File originalFile = new File(DATABASE_FILE);
+            File tempFile = new File(DATABASE_FILE + ".tmp");
+            if (originalFile.delete()) {
+                if (!tempFile.renameTo(originalFile)) {
+                    showError("Помилка під час перейменування файлу.");
+                }
+            } else {
+                showError("Помилка під час видалення оригінального файлу.");
+            }
         }
     }
 
-    private String getAccessLevel(String username) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts.length >= 4 && parts[0].equals(username)) {
-                    return parts[3]; // Повертаємо рівень доступу
-                }
+    private boolean isOldPassword(String username, String password) {
+        String[] oldPasswords = getOldPasswords(username);
+        for (String oldPassword : oldPasswords) {
+            if (oldPassword.equals(password)) {
+                return true;
             }
         }
-        throw new IllegalArgumentException("Користувача з ім'ям " + username + " не знайдено.");
+        return false;
     }
-
 
     private String[] getOldPasswords(String username) {
         File file = new File(OLD_PASSWORDS_FILE);
@@ -202,3 +172,4 @@ public class ChangePassword extends JFrame {
         JOptionPane.showMessageDialog(null, message, "Помилка", JOptionPane.ERROR_MESSAGE);
     }
 }
+

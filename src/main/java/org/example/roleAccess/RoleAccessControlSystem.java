@@ -83,7 +83,7 @@ public class RoleAccessControlSystem {
     }
 
     private String getRole(String username) {
-        String csvFile = "C:/Users/marsh/Desktop/Uni/Технології безпечного доступу/TBD_Maliarenko/TBD_Maliarenko/src/roleAccess.csv";
+        String csvFile = "C:/Users/marsh/Desktop/8 sem/Технології безпечного доступу/TBD_Maliarenko/TBD_Maliarenko/src/roleAccess.csv";
         String line;
         String delimiter = ",";
         String role = "Користувач";

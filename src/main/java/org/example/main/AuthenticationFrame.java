@@ -7,6 +7,9 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 class AuthenticationFrame extends JFrame {
     private JTextField usernameField;
@@ -45,7 +48,7 @@ class AuthenticationFrame extends JFrame {
             public void keyPressed(KeyEvent e) {
                 // Блокування Ctrl + V (Ctrl + Insert)
                 if (e.isControlDown() && (e.getKeyCode() == KeyEvent.VK_V || e.getKeyCode() == KeyEvent.VK_INSERT)) {
-                    e.consume(); // Відміна події
+                    e.consume();
                 }
             }
         });
@@ -80,13 +83,47 @@ class AuthenticationFrame extends JFrame {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
-                if (parts[0].equals(username) && parts[1].equals(password)) {
-                    return true;
+                if (parts[0].equals(username)) {
+                    // Перевірка чи введений пароль збігатися з поточним паролем користувача
+                    if (parts[1].equals(password)) {
+                        String lastPasswordChangeDate = parts[5]; // Отримання дати останньої зміни пароля
+                        if (isPasswordStillValid(lastPasswordChangeDate)) {
+                            return true; // Пароль ще актуальний
+                        } else {
+                            JOptionPane.showMessageDialog(AuthenticationFrame.this,
+                                    "Пароль не актуальний. Будь ласка, змініть пароль і спробуйте ще раз.",
+                                    "Помилка", JOptionPane.ERROR_MESSAGE);
+                            return false; // Пароль не актуальний
+                        }
+                    } else {
+                        // Невірний пароль
+                        return false;
+                    }
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        // Користувач не знайдений
         return false;
     }
+
+    private boolean isPasswordStillValid(String lastPasswordChangeDate) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date lastChangeDate = dateFormat.parse(lastPasswordChangeDate);
+            Date currentDate = new Date();
+
+            // Кількість мілісекунд у 30 днях
+            long thirtyDaysInMillis = 30L * 24 * 60 * 60 * 1000;
+
+            // Перевірка, чи не минуло 30 днів з останньої зміни пароля
+            return currentDate.getTime() - lastChangeDate.getTime() <= thirtyDaysInMillis; // Пароль ще актуальний чи ні
+        } catch (ParseException e) {
+            // Обробка помилки розбору дати
+            e.printStackTrace();
+            return false; // Якщо сталася помилка, повертаємо false
+        }
+    }
+
 }
