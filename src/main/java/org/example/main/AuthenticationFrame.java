@@ -15,6 +15,8 @@ class AuthenticationFrame extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private static final String DATABASE_FILE = "src/maliarenko_database.csv";
+    private static final int MAX_FAILED_ATTEMPTS = 3;
+    private int failedAttemptsCount = 0;
 
     private final String accessControlMethod;
 
@@ -23,7 +25,6 @@ class AuthenticationFrame extends JFrame {
         initializeFrame();
         addComponents();
     }
-
 
     private void initializeFrame() {
         setTitle("Автентифікація");
@@ -51,6 +52,13 @@ class AuthenticationFrame extends JFrame {
                     e.consume();
                 }
             }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    attemptLogin();
+                }
+            }
         });
         panel.add(passwordField);
 
@@ -62,20 +70,32 @@ class AuthenticationFrame extends JFrame {
 
     private JButton createLoginButton() {
         JButton loginButton = new JButton("Увійти");
-        loginButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
+        loginButton.addActionListener(e -> attemptLogin());
+        return loginButton;
+    }
 
-            if (authenticateUser(username, password)) {
-                MainFrame mainFrame = new MainFrame(username, accessControlMethod);
-                mainFrame.setVisible(true);
-                dispose();
+    private void attemptLogin() {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+
+        if (authenticateUser(username, password)) {
+            MainFrame mainFrame = new MainFrame(username, accessControlMethod);
+            mainFrame.setVisible(true);
+            dispose();
+        } else {
+            failedAttemptsCount++;
+            if (failedAttemptsCount >= MAX_FAILED_ATTEMPTS) {
+                // Блокування системи або користувача при досягненні максимальної кількості невдалих спроб
+                JOptionPane.showMessageDialog(AuthenticationFrame.this,
+                        "Досягнуто максимальну кількість невдалих спроб. Система буде заблокована.",
+                        "Помилка", JOptionPane.ERROR_MESSAGE);
+                System.exit(0); // Або виконайте дії для блокування користувача
             } else {
                 JOptionPane.showMessageDialog(AuthenticationFrame.this,
-                        "Невірне ім'я користувача або пароль.", "Помилка", JOptionPane.ERROR_MESSAGE);
+                        "Невірне ім'я користувача або пароль. Спроба " + failedAttemptsCount + " з " + MAX_FAILED_ATTEMPTS,
+                        "Помилка", JOptionPane.ERROR_MESSAGE);
             }
-        });
-        return loginButton;
+        }
     }
 
     private boolean authenticateUser(String username, String password) {
@@ -88,6 +108,7 @@ class AuthenticationFrame extends JFrame {
                     if (parts[1].equals(password)) {
                         String lastPasswordChangeDate = parts[5]; // Отримання дати останньої зміни пароля
                         if (isPasswordStillValid(lastPasswordChangeDate)) {
+                            failedAttemptsCount = 0; // Скидання лічильника невдалих спроб при успішній аутентифікації
                             return true; // Пароль ще актуальний
                         } else {
                             JOptionPane.showMessageDialog(AuthenticationFrame.this,
@@ -125,5 +146,4 @@ class AuthenticationFrame extends JFrame {
             return false; // Якщо сталася помилка, повертаємо false
         }
     }
-
 }
