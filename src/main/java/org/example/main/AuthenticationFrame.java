@@ -2,6 +2,8 @@ package org.example.main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -37,6 +39,16 @@ class AuthenticationFrame extends JFrame {
 
         panel.add(new JLabel("Пароль:"));
         passwordField = new JPasswordField();
+        passwordField.setTransferHandler(null); // Встановлення TransferHandler на null
+        passwordField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // Блокування Ctrl + V (Ctrl + Insert)
+                if (e.isControlDown() && (e.getKeyCode() == KeyEvent.VK_V || e.getKeyCode() == KeyEvent.VK_INSERT)) {
+                    e.consume(); // Відміна події
+                }
+            }
+        });
         panel.add(passwordField);
 
         JButton loginButton = createLoginButton();
