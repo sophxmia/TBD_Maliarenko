@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -104,8 +105,11 @@ class AuthenticationFrame extends JFrame {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
                 if (parts[0].equals(username)) {
-                    // Перевірка чи введений пароль збігатися з поточним паролем користувача
-                    if (parts[1].equals(password)) {
+                    // Зашифровати введений користувачем пароль
+                    String encryptedInputPassword = encryptPassword(password);
+                    // Порівняти зашифровані паролі
+                    if (parts[1].equals(encryptedInputPassword)) {
+                        // Пароль співпадає, тому аутентифікація успішна
                         String lastPasswordChangeDate = parts[5]; // Отримання дати останньої зміни пароля
                         if (isPasswordStillValid(lastPasswordChangeDate)) {
                             failedAttemptsCount = 0; // Скидання лічильника невдалих спроб при успішній аутентифікації
@@ -129,6 +133,21 @@ class AuthenticationFrame extends JFrame {
         return false;
     }
 
+    private String encryptPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedHash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     private boolean isPasswordStillValid(String lastPasswordChangeDate) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

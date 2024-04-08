@@ -7,6 +7,7 @@ import java.awt.*;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.security.MessageDigest;
 
 public class AddUser extends JFrame {
     private final JTextField usernameField;
@@ -121,8 +122,11 @@ public class AddUser extends JFrame {
 
         String creationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
+        // Зашифрувати пароль за допомогою алгоритму SHA-256
+        String encryptedPassword = encryptPassword(password);
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATABASE_FILE, true))) {
-            writer.write(username + ":" + password + ":" + (isComplex ? "Complex" : "Simple") + ":" + access + ":" + expiryDays + ":" + creationDate);
+            writer.write(username + ":" + encryptedPassword + ":" + (isComplex ? "Complex" : "Simple") + ":" + access + ":" + expiryDays + ":" + creationDate);
             writer.newLine();
             JOptionPane.showMessageDialog(AddUser.this,
                     "Користувач " + username + " успішно доданий до бази даних.");
@@ -132,6 +136,23 @@ public class AddUser extends JFrame {
                     "Помилка", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private String encryptPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedHash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private void checkAdminExistence() {
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {

@@ -5,14 +5,14 @@ import javax.swing.JOptionPane;
 public class PasswordUtils {
 
     public static void validatePasswordComplexity(boolean isComplex, String password) {
-        // Перевірка на довжину паролю для складного паролю
+        // Перевірка на довжину пароля для складного пароля
 
         if (isComplex && password.length() < 8) {
             JOptionPane.showMessageDialog(null,
                     "Складний пароль повинен містити принаймні 8 символів.", "Помилка", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException();
         }
-        // Перевірка на довжину паролю для простого паролю
+        // Перевірка на довжину пароля для простого пароля
         if (!isComplex && password.isEmpty()) {
             JOptionPane.showMessageDialog(null,
                     "Простий пароль повинен містити хоча б один символ.", "Помилка", JOptionPane.ERROR_MESSAGE);

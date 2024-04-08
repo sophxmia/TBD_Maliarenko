@@ -3,6 +3,7 @@ package org.example.main;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -89,12 +90,20 @@ public class ChangePassword extends JFrame {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
-                if (parts[0].equals(username) && parts[1].equals(oldPassword)) {
-                    if (!isOldPassword(username, newPassword)) { // Перевірка, чи не є новий пароль старим
-                        writer.write(username + ":" + newPassword + ":" + (isComplexNew ? "Complex" : "Simple") + ":" + expiryDays + ":" + lastPasswordChangeDate);
-                        passwordChanged = true;
+                if (parts[0].equals(username)) {
+                    if (parts[1].equals(oldPassword)) {
+                        if (!isOldPassword(username, newPassword)) {
+                            // Шифрування нового паролю перед збереженням у базі даних
+                            String encryptedNewPassword = encryptPassword(newPassword);
+                            writer.write(username + ":" + encryptedNewPassword + ":" + (isComplexNew ? "Complex" : "Simple") + ":" + expiryDays + ":" + lastPasswordChangeDate);
+                            passwordChanged = true;
+                        } else {
+                            showError("Новий пароль збігається з одним з останніх трьох старих паролів.");
+                            return;
+                        }
                     } else {
-                        showError("Новий пароль збігається з одним з останніх трьох старих паролів.");
+                        showError("Введений старий пароль невірний.");
+                        return;
                     }
                 } else {
                     writer.write(line);
@@ -118,6 +127,22 @@ public class ChangePassword extends JFrame {
             } else {
                 showError("Помилка під час видалення оригінального файлу.");
             }
+        }
+    }
+
+    private String encryptPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedHash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
