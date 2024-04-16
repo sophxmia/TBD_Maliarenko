@@ -1,19 +1,31 @@
 package org.example.main;
 
+import org.opencv.core.Core;
+
 import javax.swing.*;
+
+import static org.example.main.OpenCVExample.recognizeFace;
 
 public class Main {
     private static String accessControlMethod;
 
     public static void main(String[] args) {
-        // Запитуємо користувача про метод розмежування доступу
-        accessControlMethod = askForAccessControlMethod();
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        System.out.println(Core.VERSION);
+        if(recognizeFace()) {
+            // Запитуємо користувача про метод розмежування доступу
+            accessControlMethod = askForAccessControlMethod();
 
-        SwingUtilities.invokeLater(() -> {
-            AuthenticationFrame authFrame = new AuthenticationFrame(accessControlMethod);
-            authFrame.setVisible(true);
-        });
-
+            SwingUtilities.invokeLater(() -> {
+                AuthenticationFrame authFrame = new AuthenticationFrame(accessControlMethod);
+                authFrame.setVisible(true);
+            });
+        }else {
+            // Вивести повідомлення про невдалий вхід
+            JOptionPane.showMessageDialog(null,
+                    "Не вдалося розпізнати обличчя. Спробуйте ще раз.",
+                    "Помилка", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private static String askForAccessControlMethod() {
