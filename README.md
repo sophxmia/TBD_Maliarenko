@@ -1,26 +1,49 @@
-# Технології програмування
+# Secure access technologies
 ## Getting Started
-### Перша частина
-Розробити мовою програмування Java віконний додаток, в якому:
-* Заголовок головного вікна – «Назва дисципліни_Прізвище»
-* В пункті меню «Про автора» вказано хто розробив програму
-* Створити базу даних користувачів
-* Розробити функції для додавання в базу даних користувачів нові записи (для нових користувачів), функції для створення (введення) та зміни паролів для користувачів.
-  * Забезпечити можливість налаштування – створювати простий пароль чи складний.
-  * ```Простий пароль – будь-яка довжина паролю і будь-які символи в паролю. Складний пароль – довжина паролю не менше 8 символів і в паролі повинні використовуватися символи хоча б трьох наборів символів.```
-  * Забезпечити при створенні паролю перевірку на дотримання вказаних умов.
-* За допомогою розроблених функцій створити (задати) паролі для раніше створених користувачів таким чином: для двох користувачів – простий пароль, для трьох користувачів – складний пароль.
-  * Перевірити неможливість порушення вимог до складного паролю.
-  * Продемонструвати результат.
-* Розробити функцію автентифікації користувачів для доступу до створеного додатку з відображенням у вікні додатку імені користувача, який пройшов автентифікацію.
-  * Перевірити дієвість розробленої функції.
-  * Продемонструвати результат.
-### Друга частина
-* Спроектувати правила мандатного розмежування доступу до ресурсів додатку. Розробити всі необхідні функції для реалізації правил мандатного розмежування доступу до ресурсів додатку, що були спроектовані в пункті 1. Крім того, забезпечити можливість визначення відповідних міток у випадку додавання в систему нових користувачів і нові ресурси.
-* Розробити всі необхідні функції для перевірки коректності і дієвості реалізованих правил розмежування доступу
-### Третя лабораторна
-*Розробити мовою необхідні функції в додатку для налаштування (вибору) технології розмежування доступу, яка має використовуватися в додатку (мандатне, дискреційне, рольове). Забезпечити, щоб всі функції розроблені в другій лабораторній роботі для мандатного розмежування доступу виконувались тільки при виборі в налаштуваннях саме мандатного розмежування доступу.
-1. Розробити мовою всі необхідні функції для реалізації правил дискреційного розмежування доступу до ресурсів додатку,
-
+### Overview
+* Brief introduction to the project.
+* Explain the purpose and goals of the project.
+### Features
+1. Access Control Mechanisms
+  * Mandative Access Control
+  * Discretionary Access Control
+  * Role-Based Access Control
+2. Password Management
+  * Brute Force Password Cracking Prevention
+  * Password Strength Enhancement Mechanisms
+    * Storing Previous Passwords
+    * Password Expiry
+    * Secure Password Input
+    * Protection against Malicious Software
+    * Password Encryption
+3. Biometric Authentication
+    * Introduction to Biometric Authentication
+    * Justification for Biometric Selection
+    * Available Libraries for Biometric Recognition
+### Implementation Details
+1. Access Control Mechanisms
+* Java functions for each access control type.
+* Configuration instructions for selecting each mechanism.
+2. Password Management
+* Java functions for password management.
+* Implementation details for each enhancement mechanism.
+3. Biometric Authentication
+* Integration of biometric authentication in the application.
+* Usage instructions and implementation details.
+## Installation
+1. Clone the Repository
+* Open your preferred Integrated Development Environment (IDE).
+* Clone the GitHub repository to your local machine
+2. Install Java OpenCV
+* Download Java OpenCV from the official website: OpenCV.org.
+* Follow the installation instructions provided for your operating system.
+* Ensure that OpenCV is properly configured in your IDE.
+3. Configuration
+* Open the project in your IDE.
+* Ensure that the project is set up correctly with the Java OpenCV library.
+* Configure any necessary settings or paths within your IDE.
+4. Build and Run
+* Build the project in your IDE.
+* Run the application to verify that it functions correctly.
 ## Authors
 Sofiia Maliarenko
